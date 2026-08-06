@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dictionary — Boruca (Brúnkajk) Language Project</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="grammar.html">Bruncájc <em>Revival</em></a>
+  <nav>
+    <a href="grammar.html">Grammar</a>
+    <a href="dictionary.html" class="active">Dictionary</a>
+  </nav>
+</header>
+
+<div class="dict-shell">
+  <aside class="word-sidebar">
+    <div class="word-search-box">
+      <input type="search" id="search" placeholder="Search headword or gloss…" autocomplete="off">
+      <div class="mini-filters">
+        <select id="filter-pos"><option value="">Any part of speech</option></select>
+        <select id="filter-morph"><option value="">Any formation</option></select>
+        <select id="filter-domain"><option value="">Any domain</option></select>
+      </div>
+      <div class="dict-count" id="count"></div>
+    </div>
+    <div class="word-list" id="word-list"></div>
+  </aside>
+
+  <main class="entry-panel" id="entry-panel">
+    <div class="entry-panel-empty">Select a word from the list, or search, to see its entry.</div>
+  </main>
+</div>
+
+<script src="data/vocabulary.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
