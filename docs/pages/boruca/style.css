@@ -1,52 +1,21 @@
+/* Palette matches the rest of the site (docs/assets/css/site.css): blue
+   accent, neutral grays, white background — no dark-mode variant, since
+   no other page on the site has one. --border is a light hairline for
+   dividers/inputs; --border-strong is the site's actual box-border color
+   (#4c4c4c), used sparingly (just .btn below) to visually tie buttons to
+   the tree page's chunky box style. */
 :root {
-  --bg: #fbf8f3;
+  --bg: #ffffff;
   --bg-panel: #ffffff;
-  --ink: #2a2420;
-  --ink-soft: #5c5148;
-  --border: #e4ddd0;
-  --accent: #a34a28;
-  --accent-soft: #f2e2d4;
-  --mono-bg: #f1ece1;
-  --shadow: 0 1px 2px rgba(40, 30, 15, 0.06);
-  --radius: 8px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1b1815;
-    --bg-panel: #242019;
-    --ink: #ece5d8;
-    --ink-soft: #b6ab9a;
-    --border: #38322a;
-    --accent: #e08a5c;
-    --accent-soft: #33261c;
-    --mono-bg: #2c261e;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #1b1815;
-  --bg-panel: #242019;
-  --ink: #ece5d8;
-  --ink-soft: #b6ab9a;
-  --border: #38322a;
-  --accent: #e08a5c;
-  --accent-soft: #33261c;
-  --mono-bg: #2c261e;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-:root[data-theme="light"] {
-  --bg: #fbf8f3;
-  --bg-panel: #ffffff;
-  --ink: #2a2420;
-  --ink-soft: #5c5148;
-  --border: #e4ddd0;
-  --accent: #a34a28;
-  --accent-soft: #f2e2d4;
-  --mono-bg: #f1ece1;
-  --shadow: 0 1px 2px rgba(40, 30, 15, 0.06);
+  --ink: #333333;
+  --ink-soft: #5e6870;
+  --border: #dcdcdc;
+  --border-strong: #4c4c4c;
+  --accent: #164d89;
+  --accent-soft: #eaf2fb;
+  --mono-bg: #f4f4f4;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --radius: 7px;
 }
 
 * { box-sizing: border-box; }
@@ -63,42 +32,43 @@ html, body {
 
 a { color: var(--accent); }
 
-.site-header {
+/* Wraps the shared site navbar (docs/_includes/navbar.html) + the page
+   nav (Grammar / Dictionary) into one sticky unit fixed to the top of
+   the viewport — both bars scroll together instead of just the bottom
+   one. Horizontal padding matches site.css's .page-wrapper padding
+   (clamp(12px,2vw,32px)) so the navbar lines up the same way it does on
+   the homepage/About page, which get that inset from .page-wrapper
+   itself (these pages don't use .page-wrapper, so it has to be applied
+   here instead). Total header height is pinned to 104px (2 × 52px) —
+   .toc's and .dict-shell's sticky-offset/height calcs below assume that
+   exact number, so update them too if either bar's height changes. */
+.boruca-header {
   position: sticky;
   top: 0;
   z-index: 20;
-  display: flex;
-  align-items: baseline;
-  gap: 1.5rem;
-  padding: 0.9rem 1.5rem;
-  background: var(--bg-panel);
+
+  background: var(--bg);
+}
+
+.boruca-header .navbar {
+  height: 52px;
+  margin-bottom: 0;
+  padding: 0 clamp(12px, 2vw, 32px);
+}
+
+/* Page nav (Grammar / Dictionary) — reuses site.css's .navbar-links
+   pill-link component so these look like the same UI element as the
+   navbar above. Centered now that there's no third "Tree" link to
+   left-align against (the shared navbar's logo already links home). */
+.boruca-nav {
+  height: 52px;
+  justify-content: center;
+
+  padding: 0 clamp(12px, 2vw, 32px);
+
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow);
-}
-
-.site-header .brand {
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.site-header .brand em { color: var(--accent); font-style: normal; }
-
-.site-header nav { display: flex; gap: 1rem; margin-left: auto; font-family: system-ui, sans-serif; font-size: 0.92rem; }
-
-.site-header nav a {
-  text-decoration: none;
-  color: var(--ink-soft);
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-}
-
-.site-header nav a.active,
-.site-header nav a:hover {
-  color: var(--accent);
-  background: var(--accent-soft);
 }
 
 .layout {
@@ -117,9 +87,9 @@ a { color: var(--accent); }
 
 .toc {
   position: sticky;
-  top: 58px;
+  top: 104px;
   align-self: start;
-  max-height: calc(100vh - 58px);
+  max-height: calc(100vh - 104px);
   overflow-y: auto;
   padding: 1.25rem 1rem;
   border-right: 1px solid var(--border);
@@ -220,8 +190,16 @@ tr:last-child td { border-bottom: none; }
 
 .dict-shell {
   display: flex;
-  height: calc(100vh - 57px);
+  height: calc(100vh - 104px);
   align-items: stretch;
+
+  /* Same centered-column treatment as .layout on the grammar page, so
+     the sidebar+entry-panel group sits in the middle of the viewport
+     with matching whitespace on both sides, instead of the sidebar
+     hugging the left edge and the entry panel stretching to fill
+     whatever's left on the right. */
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .word-sidebar {
@@ -458,7 +436,7 @@ tr:last-child td { border-bottom: none; }
   font-weight: 600;
   padding: 0.35rem 0.8rem;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border-strong);
   background: var(--bg-panel);
   color: var(--ink);
   cursor: pointer;
@@ -481,10 +459,6 @@ tr:last-child td { border-bottom: none; }
   color: #3c763d;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
-}
-:root[data-theme="dark"] .edited-badge { background: #223a24; color: #9fd6a4; }
-@media (prefers-color-scheme: dark) {
-  .edited-badge { background: #223a24; color: #9fd6a4; }
 }
 .word-item .w-edited { margin-left: 0.4rem; color: #3c763d; font-size: 0.68rem; font-family: system-ui, sans-serif; text-transform: uppercase; }
 

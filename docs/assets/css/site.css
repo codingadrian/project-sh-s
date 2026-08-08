@@ -23,8 +23,7 @@
 
      Horizontally, the widest single row is deceptively deep: root →
      the unconnected Quepo/Paya column → "Proto-chibchense meridional"
-     → "Magdálenico" → an invisible column-alignment spacer (see
-     .spacer below) → 5 language boxes → the project card. Box-width's
+     → "Magdálenico" → 5 language boxes → the project card. Box-width's
      max (and the surrounding braces/gaps/padding/project-card) are
      sized so that worst-case line stays safely under 1920px with
      room to spare — see the comment above .project-card for the
@@ -181,7 +180,8 @@ body {
   background: #fff;
 }
 
-.navbar-links a:hover {
+.navbar-links a:hover,
+.navbar-links a.active {
   background: var(--yellow);
 }
 
@@ -336,6 +336,7 @@ body {
   text-align: center;
 
   color: #fff;
+  text-decoration: none;
 
   font-size: var(--box-font);
   font-weight: 700;
@@ -344,8 +345,16 @@ body {
 }
 
 
+/* .language-box is the only box type that's ever a real link (every leaf
+   in the tree now points at its docs/pages/<slug>.html stub, or Boruca's
+   real grammar) — branch-box/branch-label stay plain divs, so this hover
+   cue only ever shows up on something actually clickable. */
 .language-box {
   background: var(--orange);
+}
+
+a.language-box:hover {
+  filter: brightness(1.12);
 }
 
 
@@ -362,14 +371,6 @@ body {
 
 .dashed {
   border-style: dashed;
-}
-
-
-/* Invisible column-alignment spacers — same box-model footprint as a
-   real branch-box + brace, just not drawn, so a row that skips a
-   branch level still lines its languages up with rows that don't. */
-.spacer {
-  visibility: hidden;
 }
 
 

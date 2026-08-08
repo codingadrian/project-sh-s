@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page.title }} — Boruca (Brúnkajk) Language Project</title>
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="site-header">
-  <a class="brand" href="grammar.html">Bruncájc <em>Revival</em></a>
-  <nav>
-    <a href="grammar.html" class="active">Grammar</a>
-    <a href="dictionary.html">Dictionary</a>
-    <a href="{{ '/' | relative_url }}">&larr; Tree</a>
+<div class="boruca-header">
+  {% include navbar.html %}
+  <nav class="navbar-links boruca-nav">
+    <a href="{{ '/pages/boruca/grammar.html' | relative_url }}" class="active">Grammar</a>
+    <a href="{{ '/pages/boruca/dictionary.html' | relative_url }}">Dictionary</a>
   </nav>
-</header>
+</div>
 <div class="layout">
   <aside class="toc">
     {% include boruca-toc.html %}
