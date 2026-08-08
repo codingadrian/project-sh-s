@@ -151,12 +151,15 @@ main.content {
   min-width: 0;
 }
 
+main.content > * {
+  max-width: 78ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media (max-width: 620px) {
   main.content { padding: 1.5rem 1.1rem 4rem; }
 }
-
-.doc { max-width: 78ch; margin: 0 auto 4rem; }
-.doc:first-of-type { margin-top: 0; }
 
 h1, h2, h3, h4 { font-family: "Iowan Old Style", Georgia, serif; line-height: 1.25; color: var(--ink); scroll-margin-top: 70px; }
 h1 { font-size: 1.9rem; border-bottom: 2px solid var(--accent-soft); padding-bottom: 0.4rem; margin-top: 0; }
@@ -432,9 +435,112 @@ tr:last-child td { border-bottom: none; }
 }
 .entry-footer-meta b { color: var(--ink); font-weight: 600; }
 
+.dict-index-row {
+  margin-top: 0.35rem;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+.dict-index-row b { color: var(--ink-soft); font-weight: 600; font-family: system-ui, sans-serif; }
+
 @media (max-width: 780px) {
   .dict-shell { flex-direction: column; height: auto; }
   .word-sidebar { width: auto; flex: 0 0 auto; border-right: none; border-bottom: 1px solid var(--border); }
   .word-list { max-height: 40vh; }
   .entry-panel { max-height: none; }
+}
+
+/* Editing */
+.btn {
+  font-family: system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { color: #fff; opacity: 0.92; }
+.btn-ghost { background: transparent; }
+.btn-danger { color: #b3372c; border-color: #e3b3ab; }
+.btn-danger:hover { color: #b3372c; border-color: #b3372c; }
+
+.edit-toggle { margin-left: auto; }
+
+.edited-badge {
+  font-family: system-ui, sans-serif;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #dff0d8;
+  color: #3c763d;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+:root[data-theme="dark"] .edited-badge { background: #223a24; color: #9fd6a4; }
+@media (prefers-color-scheme: dark) {
+  .edited-badge { background: #223a24; color: #9fd6a4; }
+}
+.word-item .w-edited { margin-left: 0.4rem; color: #3c763d; font-size: 0.68rem; font-family: system-ui, sans-serif; text-transform: uppercase; }
+
+.edits-bar {
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-family: system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.edit-form {
+  max-width: 62ch;
+  font-family: system-ui, sans-serif;
+}
+.edit-field { margin: 0.85rem 0; }
+.edit-field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+.edit-field input[type="text"],
+.edit-field textarea {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Iowan Old Style", Georgia, serif;
+  font-size: 0.98rem;
+  resize: vertical;
+}
+.edit-field input[type="text"]:focus,
+.edit-field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.edit-field-row { display: flex; gap: 0.7rem; }
+.edit-field-row .edit-field { flex: 1 1 0; min-width: 0; }
+
+.edit-actions {
+  margin-top: 1.3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+.edit-actions .save-status {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
 }

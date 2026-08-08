@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Grammar — Boruca (Brúnkajk) Language Project</title>
+<title>{{ page.title }} — Boruca (Brúnkajk) Language Project</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,14 +12,15 @@
   <nav>
     <a href="grammar.html" class="active">Grammar</a>
     <a href="dictionary.html">Dictionary</a>
+    <a href="{{ '/' | relative_url }}">&larr; Tree</a>
   </nav>
 </header>
 <div class="layout">
   <aside class="toc">
-{{TOC}}
+    {% include boruca-toc.html %}
   </aside>
   <main class="content">
-{{CONTENT}}
+    {{ content }}
   </main>
 </div>
 </body>

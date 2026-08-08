@@ -1,0 +1,150 @@
+title: Chibchan Languages
+subtitle: A compact classification of the Chibchan language family
+
+# Canvas is an internal reference coordinate system (not pixels) — index.html
+# renders every x/y as a percentage of it, so the whole tree scales to fit
+# any viewport with no overflow. Positions are hand-placed to match a
+# specific reference layout (not date-proportional — that was tried in an
+# earlier pass and dropped when the visual spec changed to a fixed-column
+# org-chart look). Node boxes are positioned by their top-left corner.
+canvas:
+  width: 1200
+  height: 710
+
+theme:
+  background: "#ffffff"
+  connector: "#59595b"
+  root: "#1c4587"
+  branch: "#f1c232"
+  branch_text: "#3c3c3c"
+  language: "#ff9900"
+  live: "#f1c232"
+  panel: "#f6b26b"
+  panel_text: "#3c3c3c"
+
+# Two nodes with no documented affiliation/date are drawn disconnected from
+# the tree entirely (no connector line), matching the reference exactly —
+# not a rendering bug.
+orphans:
+  - { id: quepo, label: Quepo, status: uncertain, x: 30, y: 50, w: 115, h: 34, href: /pages/quepo.html }
+  - { id: paya, label: Paya, x: 30, y: 112, w: 115, h: 34, href: /pages/paya-pech.html }
+
+tree:
+  id: proto-chibchan
+  label: Proto-Chibchan
+  type: root
+  x: 30
+  y: 320
+  w: 115
+  h: 40
+  children:
+    - id: meridional
+      label: Proto-chibchense meridional
+      type: branch
+      x: 185
+      y: 93
+      w: 115
+      h: 44
+      children:
+        - id: votic
+          label: Vótico
+          type: branch
+          x: 340
+          y: 43
+          w: 115
+          h: 34
+          children:
+            - { id: rama, label: Rama, x: 490, y: 43, w: 115, h: 34, href: /pages/rama.html }
+            - { id: maleku, label: Maleku, x: 615, y: 43, w: 115, h: 34, href: /pages/guatuso-maleku.html }
+            - { id: huetar, label: Huetar, status: uncertain, x: 740, y: 43, w: 115, h: 34, href: /pages/huetar.html }
+        - id: magdalenico
+          label: Magdalénico
+          type: branch
+          x: 340
+          y: 155
+          w: 115
+          h: 34
+          children:
+            - { id: muisca, label: Muisca, x: 490, y: 155, w: 115, h: 34, href: /pages/muisca.html }
+            - { id: kogi, label: Kogi, x: 615, y: 155, w: 115, h: 34, href: /pages/kogi.html }
+            - { id: ika, label: Ika, x: 740, y: 155, w: 115, h: 34, href: /pages/ika.html }
+            - { id: bari, label: Bari, x: 865, y: 155, w: 115, h: 34, href: /pages/bari.html }
+            - { id: chimila, label: Chimila, x: 990, y: 155, w: 115, h: 34, href: /pages/chimila.html }
+    - id: isthmic
+      label: Ístmico
+      type: branch
+      x: 185
+      y: 450
+      w: 115
+      h: 34
+      children:
+        - id: western-isthmic
+          label: Ístmico occidental
+          type: branch
+          x: 340
+          y: 315
+          w: 115
+          h: 44
+          children:
+            - id: viceitico
+              label: Viceítico
+              type: branch
+              x: 490
+              y: 278
+              w: 115
+              h: 34
+              children:
+                - { id: bribri, label: Bribri, x: 645, y: 278, w: 100, h: 34, href: /pages/bribri.html }
+                - { id: cabecar, label: Cabécar, x: 765, y: 278, w: 110, h: 34, href: /pages/cabecar.html }
+            - id: naso
+              label: Naso
+              x: 490
+              y: 353
+              w: 115
+              h: 34
+              href: /pages/naso-terraba.html
+            - id: boruca
+              label: Boruca
+              status: live
+              x: 615
+              y: 353
+              w: 115
+              h: 34
+              href: /pages/boruca/grammar.html
+              children:
+                - { id: revived, label: Revived Boruca, x: 775, y: 353, w: 120, h: 34, href: /pages/revived-bruncajc.html }
+        - id: doracic
+          label: Dorácico
+          type: branch
+          x: 340
+          y: 453
+          w: 115
+          h: 34
+          children:
+            - { id: dorasque, label: Dorasque, x: 490, y: 453, w: 115, h: 34, href: /pages/dorasque.html }
+            - { id: changuena, label: Chánguena, status: uncertain, x: 615, y: 453, w: 115, h: 34, href: /pages/changuena.html }
+        - id: eastern-isthmic
+          label: Ístmico oriental
+          type: branch
+          x: 340
+          y: 545
+          w: 115
+          h: 44
+          children:
+            - id: guaimiico
+              label: Guaimíico
+              type: branch
+              x: 490
+              y: 510
+              w: 115
+              h: 34
+              children:
+                - { id: bocota, label: Bocotá, x: 615, y: 510, w: 115, h: 34, href: /pages/bocota.html }
+                - { id: ngabe, label: Ngäbe, x: 740, y: 510, w: 110, h: 34, href: /pages/guaymi-ngabe.html }
+            - id: kuna
+              label: Kuna
+              x: 490
+              y: 580
+              w: 115
+              h: 34
+              href: /pages/kuna.html

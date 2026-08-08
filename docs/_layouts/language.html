@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} — Chibchan Languages</title>
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body class="stub-page">
+<header class="site-topbar">
+  <a class="wordmark" href="{{ '/' | relative_url }}">Chibchan <em>Languages</em></a>
+</header>
+<main class="stub-main">
+  <div class="stub-card">
+    <p class="stub-breadcrumb">{{ page.breadcrumb }}</p>
+    <h1>{{ page.title }}</h1>
+    {% if page.native %}<p class="stub-native-name">{{ page.native }}</p>{% endif %}
+    <span class="stub-status"><span class="dot"></span> {{ page.status | default: "coming soon" }}</span>
+    {{ content }}
+    <a class="stub-back" href="{{ '/' | relative_url }}">&larr; back to the tree</a>
+  </div>
+</main>
+</body>
+</html>

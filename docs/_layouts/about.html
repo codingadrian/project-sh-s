@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body class="about-page">
+
+<div class="page-wrapper">
+
+{% include navbar.html %}
+
+<main class="about-main">
+  {{ content }}
+</main>
+
+<div class="bottom-line">
+  <span class="line-dot"></span>
+  <div class="line"></div>
+  <span class="line-dot"></span>
+</div>
+
+</div>
+
+</body>
+</html>

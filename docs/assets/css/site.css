@@ -1,0 +1,697 @@
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+:root {
+  --blue: #164d89;
+  --yellow: #f5c332;
+  --orange: #ff9500;
+  --project: #f7b267;
+
+  --border: #4c4c4c;
+  --text: #ffffff;
+  --gray-text: #5e6870;
+
+  /* Fluid sizing: scales with viewport instead of being fixed in px.
+     IMPORTANT: the clamp() *minimum* is a hard floor that does NOT
+     shrink with the viewport — only the middle value does.
+
+     Vertically, the tallest column (Ístmico) stacks 7 box rows plus
+     several gaps, so height-related minimums are kept conservative
+     (this overflowed once already when box-height's min was pushed
+     to 68px: 7 × 68px = 476px of boxes alone, before any gaps).
+
+     Horizontally, the widest single row is deceptively deep: root →
+     the unconnected Quepo/Paya column → "Proto-chibchense meridional"
+     → "Magdálenico" → an invisible column-alignment spacer (see
+     .spacer below) → 5 language boxes → the project card. Box-width's
+     max (and the surrounding braces/gaps/padding/project-card) are
+     sized so that worst-case line stays safely under 1920px with
+     room to spare — see the comment above .project-card for the
+     same math.
+
+     --brace-width is deliberately kept smaller than --horizontal-gap:
+     .brace's margin is computed with calc() so brace-width + both
+     margins always equals horizontal-gap exactly (see .brace below).
+     That's what makes a "branch-box → brace → chain" row line up
+     pixel-for-pixel with a plain "box → gap → box" row instead of
+     drifting right by (brace width − gap width) at every branch. */
+  --box-width: clamp(58px, 8.2vw, 158px);
+  --box-height: clamp(24px, 7.3vh, 90px);
+  --box-font: clamp(9.5px, 1.1vw, 16px);
+
+  --horizontal-gap: clamp(6px, 0.9vw, 18px);
+  --row-gap: clamp(5px, 1.65vh, 21px);
+  --brace-width: clamp(4px, 0.45vw, 9px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333333;
+}
+
+
+/* =========================================================
+   PAGE — fills the viewport, no fixed canvas size
+========================================================= */
+
+.page-wrapper {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: clamp(8px, 1.6vh, 18px) clamp(12px, 2vw, 32px);
+
+  background: #fff;
+
+  overflow: auto;
+}
+
+
+/* =========================================================
+   NAVBAR — shared across pages via _includes/navbar.html.
+   Kept compact on purpose: on the homepage it sits directly above
+   .tree-wrapper, which is part of the same "everything fits in
+   100vh, no scrollbar" budget as the tree itself.
+========================================================= */
+
+.navbar {
+  flex: 0 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  /* .navbar is also a Bootstrap component class (Bootstrap is only
+     loaded on the homepage, not the About page) — Bootstrap's own
+     .navbar rule sets align-items:center, justify-content:space-between
+     and vertical padding. We only overrode display/flex-direction
+     above, so those three properties leaked through and centered
+     navbar-row instead of stretching it — which is why the homepage
+     navbar looked different from the About page (no Bootstrap there,
+     so it fell back to the correct browser-default stretch). Setting
+     them explicitly here neutralizes the collision regardless of
+     stylesheet load order. */
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+
+  margin-bottom: clamp(8px, 1.6vh, 20px);
+}
+
+.navbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(12px, 2vw, 32px);
+}
+
+/* Matches .bottom-line exactly (same margin-top scale, and reuses
+   .line/.line-dot directly) so the navbar's bottom edge mirrors the
+   one at the bottom of the page instead of a plain border. */
+.navbar-line {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 14px);
+
+  /* .navbar-brand is also a Bootstrap component class — neutralize
+     its padding/margin/font-size/white-space the same way as .navbar
+     above, so this renders identically with or without Bootstrap
+     loaded. */
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  white-space: nowrap;
+
+  text-decoration: none;
+}
+
+.navbar-logo {
+  width: clamp(28px, 3vw, 44px);
+  height: clamp(28px, 3vw, 44px);
+
+  display: block;
+}
+
+.navbar-title {
+  font-size: clamp(15px, 1.6vw, 22px);
+  font-weight: 700;
+
+  color: #f0b51a;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.4vw, 20px);
+}
+
+.navbar-links a {
+  padding: clamp(5px, 0.8vh, 8px) clamp(12px, 1.4vw, 18px);
+
+  border: 2px solid var(--border);
+  border-radius: 7px;
+
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 700;
+
+  color: #333;
+  text-decoration: none;
+
+  background: #fff;
+}
+
+.navbar-links a:hover {
+  background: var(--yellow);
+}
+
+
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
+.about-page {
+  background: #fff;
+}
+
+.about-main {
+  /* flex: 1, like .tree-wrapper on the homepage, so this grows to
+     fill the leftover space in .page-wrapper's column and pushes
+     .bottom-line down to the bottom of the viewport instead of
+     leaving it sitting right under the (short) content. */
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+
+  max-width: 720px;
+
+  margin: 0 auto;
+  padding: clamp(20px, 4vh, 48px) clamp(16px, 3vw, 32px);
+
+  font-size: clamp(14px, 1vw, 16px);
+  line-height: 1.6;
+
+  color: #333333;
+}
+
+.about-main h1 {
+  margin-top: 0;
+
+  color: #164d89;
+}
+
+
+/* =========================================================
+   TREE — fills remaining viewport height
+========================================================= */
+
+.tree-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+
+  display: flex;
+  /* center, not stretch: tree-core and .project-card each size to
+     their own content (see .tree-core below) and are centered as a
+     whole within whatever leftover vertical space this row has,
+     instead of being force-stretched to fill it — that stretching is
+     what made Paya's gap swell regardless of .main-branches's gap
+     value. */
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.4vw, 24px);
+
+  position: relative;
+}
+
+
+/* Wraps root + root brace + main-branches so this group's height is
+   driven by its own content (main-branches, via internal stretch —
+   see .root-column/.brace below) rather than by tree-wrapper's
+   externally-imposed height. */
+.tree-core {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+.root-column {
+  display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+}
+
+
+/* Paya: a plain flex row, left-aligned by default (no align-self
+   override), so it lands in the same column as the branch-label
+   boxes — see the HTML comment there. */
+.orphan-row {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+}
+
+
+/* Quepo: no brace connects it into the Vótico row it sits in — the
+   extra left margin keeps it visually separate from the Rama/Maleku/
+   Huetar bracket, so its position here doesn't read as a
+   classification claim, just a layout choice. See the HTML comment
+   there. */
+.quepo-placement {
+  margin-left: clamp(20px, 2.5vw, 40px);
+}
+
+.root-box {
+  width: var(--box-width);
+  height: var(--box-height);
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 4px solid var(--border);
+  border-radius: 7px;
+
+  background: var(--blue);
+
+  color: var(--text);
+
+  font-size: var(--box-font);
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   GENERAL BOXES
+========================================================= */
+
+.language-box,
+.branch-box,
+.branch-label {
+  width: var(--box-width);
+  min-width: var(--box-width);
+  height: var(--box-height);
+
+  /* boxes have a definite height, so a "stretch" ancestor won't
+     distort them — but they also need to be explicitly re-centered,
+     since a stretch-aligned item with a definite cross size aligns
+     to flex-start rather than center by default. */
+  align-self: center;
+  flex-shrink: 0;
+
+  border: 4px solid var(--border);
+  border-radius: 7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  color: #fff;
+
+  font-size: var(--box-font);
+  font-weight: 700;
+
+  padding: clamp(5px, 0.7vh, 9px) clamp(8px, 1vw, 15px);
+}
+
+
+.language-box {
+  background: var(--orange);
+}
+
+
+.branch-box,
+.branch-label {
+  background: var(--yellow);
+}
+
+
+.branch-two-line {
+  line-height: 1.05;
+}
+
+
+.dashed {
+  border-style: dashed;
+}
+
+
+/* Invisible column-alignment spacers — same box-model footprint as a
+   real branch-box + brace, just not drawn, so a row that skips a
+   branch level still lines its languages up with rows that don't. */
+.spacer {
+  visibility: hidden;
+}
+
+
+/* =========================================================
+   BRACES — SVG curly braces that stretch to match the height
+   of whatever they're connecting, instead of a font glyph
+   forced into shape with a distorting scaleX() transform.
+========================================================= */
+
+.brace {
+  flex-shrink: 0;
+  align-self: stretch;
+
+  width: var(--brace-width);
+  /* brace-width + both margins = horizontal-gap, always — see the
+     :root comment. Keeps branch→brace→chain transitions the same
+     width as a plain chain gap, so columns stay aligned. */
+  margin: 0 calc((var(--horizontal-gap) - var(--brace-width)) / 2);
+
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brace path {
+  vector-effect: non-scaling-stroke;
+}
+
+
+/* =========================================================
+   MAIN BRANCHES
+========================================================= */
+
+.main-branches {
+  /* No min-width: 0 here on purpose — if the tree's content genuinely
+     doesn't fit, it should overflow into a scrollbar (page-wrapper
+     has overflow: auto), not shrink below its content and let rows
+     spill out underneath the project card. */
+  flex: 0 1 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  /* .main-branches only has 3 children (the two major-branch groups
+     plus Paya's row in between), so this gap is literally the space
+     above and below Paya — matched to --row-gap (the same spacing
+     used between nested rows like Bribri/Boruca) instead of a much
+     larger value, so Paya doesn't sit in an oversized gap. */
+  gap: var(--row-gap);
+}
+
+
+.major-branch {
+  display: flex;
+  align-items: stretch;
+}
+
+
+.subbranches {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  /* Same gap value as .istmico-subbranches on purpose — the two
+     halves of the tree (2 rows above, 3 groups below) should feel
+     like they share one consistent vertical rhythm, not two
+     different ones. */
+  gap: clamp(10px, 3vh, 35px);
+}
+
+
+.istmico-subbranches {
+  gap: clamp(10px, 3vh, 35px);
+}
+
+
+.istmico-main {
+  align-self: center;
+}
+
+
+/* =========================================================
+   TREE ROWS
+========================================================= */
+
+.tree-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+
+.nested-row + .nested-row {
+  margin-top: var(--row-gap);
+}
+
+
+/* =========================================================
+   LANGUAGE CHAINS
+========================================================= */
+
+.language-chain {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: var(--horizontal-gap);
+}
+
+
+/* =========================================================
+   NESTED GROUPS
+========================================================= */
+
+.western-group,
+.eastern-group {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  gap: var(--row-gap);
+}
+
+
+/* =========================================================
+   SPACING
+========================================================= */
+
+.branch-label {
+  margin-right: 4px;
+}
+
+/* Naso/Boruca (and any similar pair) sit directly in a .nested-row
+   with no .language-chain wrapper around them, so they need their
+   own gap — otherwise they render touching, with zero space between
+   them, unlike every other language pairing in the tree. */
+.nested-row > .language-box + .language-box {
+  margin-left: var(--horizontal-gap);
+}
+
+.western-group .language-chain,
+.eastern-group .language-chain {
+  gap: var(--horizontal-gap);
+}
+
+
+/* =========================================================
+   PROJECT CARD
+
+   Width is deliberately capped: this card sits at the end of the
+   widest horizontal line in the tree (root → Quepo/Paya → 2 nested
+   branch labels → 5 language boxes → this card), so its width is
+   part of the same "must fit in 100vw" budget as the boxes — see
+   the --box-width comment in :root. Checked to keep a healthy
+   buffer (80px+) down to a 1366px-wide window, not just at 1920px —
+   an earlier attempt to widen this to clamp(300px, 20vw, 390px)
+   only left ~70px of buffer at 1920px and would have overflowed
+   (and, since flex-shrink is 0 here, triggered a horizontal
+   scrollbar rather than visibly growing) on anything narrower.
+========================================================= */
+
+.project-card {
+  flex: 0 0 auto;
+  align-self: center;
+
+  width: clamp(220px, 15vw, 310px);
+  min-height: clamp(200px, 30vh, 330px);
+
+  padding: clamp(20px, 2.8vh, 36px) clamp(16px, 2vw, 26px) clamp(16px, 2.2vh, 28px);
+
+  border: 4px solid var(--border);
+
+  border-radius: clamp(20px, 3.2vw, 42px);
+
+  background: var(--project);
+
+  color: var(--gray-text);
+}
+
+
+.project-card h3 {
+  margin: 0 0 clamp(8px, 1.4vh, 16px);
+
+  text-align: center;
+
+  font-size: var(--box-font);
+  font-weight: 700;
+}
+
+
+.project-card p {
+  margin-bottom: clamp(8px, 1.4vh, 16px);
+
+  font-size: clamp(12px, 1.1vw, 17px);
+  line-height: 1.3;
+
+  font-weight: 600;
+}
+
+
+.project-card-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  margin-top: clamp(2px, 0.4vh, 6px);
+
+  font-size: clamp(12px, 1.1vw, 17px);
+  font-weight: 700;
+
+  color: #164d89;
+  text-decoration: none;
+}
+
+.project-card-more:hover {
+  text-decoration: underline;
+}
+
+.project-card-more span {
+  transition: transform 0.15s ease;
+}
+
+.project-card-more:hover span {
+  transform: translateX(3px);
+}
+
+
+/* =========================================================
+   LEGEND
+========================================================= */
+
+.legend {
+  flex: 0 0 auto;
+
+  margin-top: clamp(6px, 1vh, 14px);
+
+  display: flex;
+  align-items: center;
+
+  gap: clamp(18px, 2.4vw, 40px);
+}
+
+
+.legend-item {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  font-size: clamp(11px, 1.05vw, 14px);
+
+  color: #444;
+
+  font-weight: 600;
+}
+
+
+.legend-square {
+  width: clamp(15px, 1.4vw, 24px);
+  height: clamp(15px, 1.4vw, 24px);
+
+  display: inline-block;
+
+  border: 2px solid var(--border);
+
+  border-radius: 4px;
+}
+
+
+.proto-square {
+  background: var(--blue);
+}
+
+
+.branch-square {
+  background: var(--yellow);
+}
+
+
+.language-square {
+  background: var(--orange);
+}
+
+
+/* =========================================================
+   BOTTOM LINE
+========================================================= */
+
+.bottom-line {
+  flex: 0 0 auto;
+
+  width: 100%;
+
+  margin-top: clamp(4px, 0.7vh, 8px);
+
+  display: flex;
+  align-items: center;
+}
+
+
+.line {
+  flex: 1;
+
+  height: 2px;
+
+  background: #666;
+}
+
+
+.line-dot {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #666;
+}

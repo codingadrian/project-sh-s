@@ -1,0 +1,32 @@
+<!-- Shared site navbar: logo + project name on the left, page nav on
+     the right. Included from any page that has front matter (so
+     Liquid runs on it) via Jekyll's include tag. Every href/src here
+     uses relative_url with a leading slash so it resolves correctly
+     regardless of how deep the including page sits (docs/index.html
+     at the root vs. docs/pages/about.md one level down).
+
+     NOTE: don't write the literal include-tag syntax for this file
+     inside this comment — Liquid parses curly-brace tags even inside
+     HTML comments, so writing this file's own include tag here makes
+     it include itself recursively and crashes the Jekyll build. -->
+<header class="navbar">
+
+  <div class="navbar-row">
+
+    <a class="navbar-brand" href="{{ '/' | relative_url }}">
+      <img class="navbar-logo" src="{{ '/assets/images/logo.png' | relative_url }}" alt="">
+      <span class="navbar-title">Project Shá's</span>
+    </a>
+
+  </div>
+
+  <!-- Same dot-line-dot styling as .bottom-line at the bottom of the
+       page (reuses .line/.line-dot directly), so the navbar's bottom
+       edge and the page's bottom edge match. -->
+  <div class="navbar-line">
+    <span class="line-dot"></span>
+    <div class="line"></div>
+    <span class="line-dot"></span>
+  </div>
+
+</header>

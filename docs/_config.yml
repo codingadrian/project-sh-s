@@ -1,0 +1,20 @@
+title: Chibchan Languages
+description: A reference grammar & dictionary project for the Chibchan languages
+lang: en
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+  syntax_highlighter: rouge
+
+# Project-page hosting (https://<user>.github.io/<repo>/) needs a baseurl;
+# a user page or custom domain should leave this blank. Links in this site
+# are written as plain relative paths (no leading slash) specifically so
+# they work correctly either way without touching this setting.
+baseurl: ""
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
