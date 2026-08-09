@@ -34,6 +34,9 @@
   var posSelect = document.getElementById("filter-pos");
   var morphSelect = document.getElementById("filter-morph");
   var domainSelect = document.getElementById("filter-domain");
+  var statusSelect = document.getElementById("filter-status");
+  var dupCheckbox = document.getElementById("filter-dup");
+  var dupTotalEl = document.getElementById("dup-total");
   var listEl = document.getElementById("word-list");
   var panelEl = document.getElementById("entry-panel");
   var countEl = document.getElementById("count");
@@ -60,47 +63,85 @@
     { key: "notes", label: "Notes", type: "textarea" }
   ];
 
-  function loadEdits() {
+  // Deletions and review marks follow the exact same "local override,
+  // never mutate ALL/BY_ID, exportable, revertible" pattern as edits above
+  // — each just lives under its own localStorage key so they can be
+  // cleared/exported independently if needed, though the UI treats all
+  // three as one combined "local changes" set (see refreshChangesBar).
+  var DELETIONS_KEY = "borucaVocabDeletions_v1";
+  var REVIEWS_KEY = "borucaVocabReviews_v1";
+
+  function loadJSONStore(key) {
     try {
-      var raw = localStorage.getItem(EDITS_KEY);
+      var raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : {};
     } catch (err) {
       return {};
     }
   }
-  function persistEdits() {
+  function persistJSONStore(key, store) {
     try {
-      localStorage.setItem(EDITS_KEY, JSON.stringify(edits));
+      localStorage.setItem(key, JSON.stringify(store));
     } catch (err) {
-      /* storage unavailable (e.g. private browsing) — edits stay in-memory only */
+      /* storage unavailable (e.g. private browsing) — stays in-memory only */
     }
   }
+
+  function loadEdits() { return loadJSONStore(EDITS_KEY); }
+  function persistEdits() { persistJSONStore(EDITS_KEY, edits); }
   var edits = loadEdits();
+
+  function persistDeletions() { persistJSONStore(DELETIONS_KEY, deletions); }
+  var deletions = loadJSONStore(DELETIONS_KEY);
+
+  function persistReviews() { persistJSONStore(REVIEWS_KEY, reviews); }
+  var reviews = loadJSONStore(REVIEWS_KEY);
+
+  function isDeleted(id) {
+    return Object.prototype.hasOwnProperty.call(deletions, id);
+  }
 
   function effectiveEntry(id) {
     var base = BY_ID[id];
     if (!base) return base;
-    var edit = edits[id];
-    if (!edit) return base;
     var merged = Object.assign({}, base);
-    Object.keys(edit.changes).forEach(function (field) {
-      merged[field] = edit.changes[field].new;
-    });
+    var edit = edits[id];
+    if (edit) {
+      Object.keys(edit.changes).forEach(function (field) {
+        merged[field] = edit.changes[field].new;
+      });
+    }
+    if (reviews[id]) merged.project_review_status = reviews[id].status;
     return merged;
   }
 
-  function editsCount() {
-    return Object.keys(edits).length;
+  // Union of every id touched by an edit, a deletion, or a review mark —
+  // one combined count for the "local changes" bar, since from the user's
+  // point of view these are all just "things I did in this browser that
+  // still need to be exported and applied to the real database."
+  function changedIds() {
+    var ids = {};
+    Object.keys(edits).forEach(function (id) { ids[id] = true; });
+    Object.keys(deletions).forEach(function (id) { ids[id] = true; });
+    Object.keys(reviews).forEach(function (id) { ids[id] = true; });
+    return Object.keys(ids);
   }
 
-  function refreshEditsBar() {
-    var n = editsCount();
+  function refreshChangesBar() {
+    var n = changedIds().length;
     if (!n) {
       editsBarEl.hidden = true;
       return;
     }
     editsBarEl.hidden = false;
-    editsCountEl.textContent = n + (n === 1 ? " word edited locally" : " words edited locally");
+    var parts = [];
+    var editCount = Object.keys(edits).length;
+    var delCount = Object.keys(deletions).length;
+    var revCount = Object.keys(reviews).length;
+    if (editCount) parts.push(editCount + " edited");
+    if (delCount) parts.push(delCount + " deleted");
+    if (revCount) parts.push(revCount + " review-marked");
+    editsCountEl.textContent = n + (n === 1 ? " word changed locally" : " words changed locally") + " (" + parts.join(", ") + ")";
   }
 
   function downloadJSON(filename, data) {
@@ -116,24 +157,47 @@
   }
 
   editsExportBtn.addEventListener("click", function () {
-    var out = Object.keys(edits).map(function (id) {
-      var edit = edits[id];
-      return {
-        id: Number(id),
-        headword: effectiveEntry(id).headword,
-        edited_at: edit.edited_at,
-        changes: edit.changes
-      };
-    });
+    var out = {
+      exported_at: new Date().toISOString(),
+      edits: Object.keys(edits).map(function (id) {
+        var edit = edits[id];
+        return {
+          id: Number(id),
+          headword: (effectiveEntry(id) || BY_ID[id] || {}).headword,
+          edited_at: edit.edited_at,
+          changes: edit.changes
+        };
+      }),
+      deletions: Object.keys(deletions).map(function (id) {
+        return {
+          id: Number(id),
+          headword: (BY_ID[id] || {}).headword,
+          deleted_at: deletions[id].deleted_at
+        };
+      }),
+      reviews: Object.keys(reviews).map(function (id) {
+        return {
+          id: Number(id),
+          headword: (BY_ID[id] || {}).headword,
+          status: reviews[id].status,
+          reviewed_at: reviews[id].reviewed_at
+        };
+      })
+    };
     var stamp = new Date().toISOString().slice(0, 10);
-    downloadJSON("boruca-dictionary-edits-" + stamp + ".json", out);
+    downloadJSON("boruca-dictionary-changes-" + stamp + ".json", out);
   });
 
   editsClearBtn.addEventListener("click", function () {
-    if (!confirm("Discard all " + editsCount() + " local edit(s)? This can't be undone — export first if you want to keep a copy.")) return;
+    var n = changedIds().length;
+    if (!confirm("Discard all " + n + " local change(s) (edits, deletions, and review marks)? This can't be undone — export first if you want to keep a copy.")) return;
     edits = {};
+    deletions = {};
+    reviews = {};
     persistEdits();
-    refreshEditsBar();
+    persistDeletions();
+    persistReviews();
+    refreshChangesBar();
     applyFilters();
     if (state.selectedId != null) selectEntry(state.selectedId, { scroll: false });
   });
@@ -156,8 +220,11 @@
   fillSelect(morphSelect, FACETS.morphologyType || []);
   fillSelect(domainSelect, FACETS.semanticDomain || []);
 
-  var state = { query: "", pos: "", morph: "", domain: "", selectedId: null, editingId: null };
+  var state = { query: "", pos: "", morph: "", domain: "", status: "", dupOnly: false, selectedId: null, editingId: null };
   var filtered = ALL;
+
+  var TOTAL_DUP_ENTRIES = ALL.reduce(function (n, e) { return (e.dup_group || e.exact_dup_group) ? n + 1 : n; }, 0);
+  if (dupTotalEl) dupTotalEl.textContent = TOTAL_DUP_ENTRIES ? "(" + TOTAL_DUP_ENTRIES.toLocaleString() + ")" : "";
 
   function normalize(s) {
     return (s || "").toString().toLowerCase();
@@ -190,10 +257,19 @@
   function applyFilters() {
     var q = normalize(state.query);
     filtered = ALL.filter(function (base) {
+      var deleted = isDeleted(base.id);
+      // "Deleted (locally)" is a special view for reviewing/undoing your own
+      // deletions — everywhere else, locally-deleted entries are hidden.
+      if (state.status === "deleted") return deleted;
+      if (deleted) return false;
+
       var e = effectiveEntry(base.id);
       if (state.pos && e.part_of_speech !== state.pos) return false;
       if (state.morph && e.morphology_type !== state.morph) return false;
       if (state.domain && e.semantic_domain !== state.domain) return false;
+      if (state.status === "reviewed" && e.project_review_status !== "reviewed") return false;
+      if (state.status === "unreviewed" && e.project_review_status === "reviewed") return false;
+      if (state.dupOnly && !e.dup_group && !e.exact_dup_group) return false;
       if (!q) return true;
       return (
         normalize(e.headword).indexOf(q) !== -1 ||
@@ -224,11 +300,16 @@
       }
       var glossPreview = e.gloss_es || e.gloss_en || "";
       var activeClass = e.id === state.selectedId ? " active" : "";
+      var exactDupClass = e.exact_dup_group ? " has-exact-dup" : "";
       html.push(
-        '<div class="word-item' + activeClass + '" data-id="' + e.id + '" role="button" tabindex="0">' +
+        '<div class="word-item' + activeClass + exactDupClass + '" data-id="' + e.id + '" role="button" tabindex="0">' +
           '<span class="w-head">' + escapeHtml(e.headword) + "</span>" +
           (e.part_of_speech ? '<span class="w-pos">' + escapeHtml(posLabel(e)) + "</span>" : "") +
+          (isDeleted(e.id) ? '<span class="w-deleted">deleted</span>' : "") +
           (edits[e.id] ? '<span class="w-edited">edited</span>' : "") +
+          (e.exact_dup_group ? '<span class="w-exact-dup" title="Byte-identical headword + gloss to ' + e.exact_dup_siblings.length + ' other entr' + (e.exact_dup_siblings.length === 1 ? "y" : "ies") + ' — a true duplicate, not a homograph">duplicate</span>' : "") +
+          (!e.exact_dup_group && e.dup_group ? '<span class="w-dup" title="Shares a spelling with ' + e.dup_siblings.length + ' other entr' + (e.dup_siblings.length === 1 ? "y" : "ies") + '">dup</span>' : "") +
+          (e.project_review_status === "reviewed" ? '<span class="w-reviewed" title="Reviewed">&#10003;</span>' : "") +
           (glossPreview ? '<span class="w-gloss">' + escapeHtml(glossPreview) + "</span>" : "") +
           "</div>"
       );
@@ -246,6 +327,15 @@
   }
 
   function renderDetail(entry) {
+    if (isDeleted(entry.id)) {
+      panelEl.innerHTML =
+        '<div class="entry-panel-empty">' +
+        '<p>"' + escapeHtml(entry.headword) + '" is marked for local deletion.</p>' +
+        '<button type="button" class="btn btn-primary" data-action="restore" data-id="' + entry.id + '">Restore</button>' +
+        "</div>";
+      return;
+    }
+
     var parts = [];
     parts.push('<article class="dict-entry">');
 
@@ -255,6 +345,7 @@
       parts.push('<span class="pos-abbr">' + escapeHtml(posLabel(entry)) + "</span>");
     }
     if (entry.tone_marked) parts.push('<span class="tag">tone</span>');
+    if (entry.project_review_status === "reviewed") parts.push('<span class="tag tag-reviewed">reviewed</span>');
     if (edits[entry.id]) {
       parts.push('<span class="edited-badge">edited</span>');
       parts.push('<button type="button" class="btn btn-ghost" data-action="revert" data-id="' + entry.id + '">Revert</button>');
@@ -263,7 +354,15 @@
       parts.push('<span class="dict-original">orig. ' + escapeHtml(entry.headword_original) + "</span>");
     }
     parts.push(
+      '<button type="button" class="btn" data-action="toggle-review" data-id="' + entry.id + '">' +
+        (entry.project_review_status === "reviewed" ? "Mark unreviewed" : "Mark reviewed") +
+        "</button>"
+    );
+    parts.push(
       '<button type="button" class="btn edit-toggle" data-action="edit" data-id="' + entry.id + '">Edit</button>'
+    );
+    parts.push(
+      '<button type="button" class="btn btn-danger" data-action="delete" data-id="' + entry.id + '">Delete</button>'
     );
     parts.push("</div>");
 
@@ -276,6 +375,39 @@
         parts.push('<span class="example-es">' + escapeHtml(entry.example_translation_es) + "</span>");
       }
       parts.push("</div>");
+    }
+
+    if (entry.exact_dup_group && entry.exact_dup_siblings.length) {
+      var exactLinks = entry.exact_dup_siblings
+        .map(function (sid) {
+          var sib = BY_ID[sid];
+          if (!sib) return "";
+          return '<button type="button" class="dup-link dup-link-exact" data-action="goto" data-id="' + sid + '">' + escapeHtml(sib.headword) + " — " + escapeHtml(sib.gloss_es || sib.gloss_en || "") + " (#" + formatIndex(sib.id) + ")</button>";
+        })
+        .filter(Boolean)
+        .join("");
+      parts.push(
+        '<div class="exact-dup-callout">' +
+          '<span class="exact-dup-title">Exact duplicate</span>' +
+          '<span class="dup-explain">byte-identical headword and gloss to:</span>' +
+          exactLinks +
+        "</div>"
+      );
+    } else if (entry.dup_group && entry.dup_siblings.length) {
+      var siblingLinks = entry.dup_siblings
+        .map(function (sid) {
+          var sib = BY_ID[sid];
+          if (!sib) return "";
+          return '<button type="button" class="dup-link" data-action="goto" data-id="' + sid + '">' + escapeHtml(sib.headword) + " — " + escapeHtml(sib.gloss_es || sib.gloss_en || "") + "</button>";
+        })
+        .filter(Boolean)
+        .join("");
+      parts.push(
+        relatedRow(
+          "possible duplicate",
+          '<span class="dup-explain">shares a spelling (once n\'/ñ is treated the same way) with:</span>' + siblingLinks
+        )
+      );
     }
 
     if (entry.morphology_type && entry.morphology_type !== "simple_root") {
@@ -355,7 +487,7 @@
       delete edits[id];
     }
     persistEdits();
-    refreshEditsBar();
+    refreshChangesBar();
   }
 
   function selectEntry(id, opts) {
@@ -395,10 +527,34 @@
       if (confirm("Discard your local edit to this word and restore the original?")) {
         delete edits[id];
         persistEdits();
-        refreshEditsBar();
+        refreshChangesBar();
         applyFilters();
         renderDetail(effectiveEntry(id));
       }
+    } else if (action === "delete") {
+      var headword = effectiveEntry(id).headword;
+      if (confirm('Mark "' + headword + '" for deletion?\n\nThis only affects your own browser — nothing is removed from the actual database until you export your changes and apply them. Find it again later under review status "Deleted (locally)" to restore it.')) {
+        deletions[id] = { deleted_at: new Date().toISOString() };
+        persistDeletions();
+        refreshChangesBar();
+        applyFilters();
+        renderDetail(effectiveEntry(id));
+      }
+    } else if (action === "restore") {
+      delete deletions[id];
+      persistDeletions();
+      refreshChangesBar();
+      applyFilters();
+      renderDetail(effectiveEntry(id));
+    } else if (action === "toggle-review") {
+      var next = effectiveEntry(id).project_review_status === "reviewed" ? "unreviewed" : "reviewed";
+      reviews[id] = { status: next, reviewed_at: new Date().toISOString() };
+      persistReviews();
+      refreshChangesBar();
+      applyFilters();
+      renderDetail(effectiveEntry(id));
+    } else if (action === "goto") {
+      selectEntry(id);
     }
   });
 
@@ -453,9 +609,17 @@
     state.domain = domainSelect.value;
     applyFilters();
   });
+  statusSelect.addEventListener("change", function () {
+    state.status = statusSelect.value;
+    applyFilters();
+  });
+  dupCheckbox.addEventListener("change", function () {
+    state.dupOnly = dupCheckbox.checked;
+    applyFilters();
+  });
 
   applyFilters();
-  refreshEditsBar();
+  refreshChangesBar();
 
   var hashMatch = /^#e-(\d+)$/.exec(location.hash);
   var qParam = new URLSearchParams(location.search).get("q");

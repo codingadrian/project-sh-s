@@ -27,11 +27,21 @@ layout: null
         <select id="filter-pos"><option value="">Any part of speech</option></select>
         <select id="filter-morph"><option value="">Any formation</option></select>
         <select id="filter-domain"><option value="">Any domain</option></select>
+        <select id="filter-status">
+          <option value="">Any review status</option>
+          <option value="unreviewed">Unreviewed</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="deleted">Deleted (locally)</option>
+        </select>
       </div>
+      <label class="dup-filter">
+        <input type="checkbox" id="filter-dup">
+        Duplicates only (spelling clashes + exact dupes) <span id="dup-total"></span>
+      </label>
       <div class="dict-count" id="count"></div>
       <div class="edits-bar" id="edits-bar" hidden>
         <span id="edits-count"></span>
-        <button type="button" id="edits-export" class="btn btn-ghost">Export edits</button>
+        <button type="button" id="edits-export" class="btn btn-ghost">Export changes</button>
         <button type="button" id="edits-clear" class="btn btn-ghost">Clear all</button>
       </div>
     </div>
