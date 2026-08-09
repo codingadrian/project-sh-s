@@ -4,18 +4,12 @@ layout: null
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Chibchan Languages</title>
+<title>Bruncájc (Boruca) — Project Shá's</title>
 
-  <!-- Bootstrap 5 -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
-
-  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
 </head>
 
 <body>
@@ -24,355 +18,63 @@ layout: null
 
   {% include navbar.html %}
 
-
   <!-- =====================================================
-       MAIN TREE
+       HOME — this used to be a family-tree overview of all
+       Chibchan languages; the project has narrowed scope to
+       just Bruncájc (Boruca), so the homepage now IS the
+       Boruca page. Two tracks: Shá's (the language as
+       documented/spoken today) and Trú (a proposed revived
+       form) — see PROJECT_STRUCTURE.md's 2026-08-09 entry for
+       why. Still zero JavaScript, same as the page this
+       replaced: the two tracks are plain link panels, not a
+       hover/JS menu, so this works the same on touch devices.
   ====================================================== -->
 
-  <div class="tree-wrapper">
-
-    <!-- tree-core wraps root+brace+main-branches so this group sizes
-         to its own content (via internal stretch) instead of being
-         force-stretched to tree-wrapper's full imposed height — that
-         was what made Paya's gap swell to fill leftover space even
-         after shrinking .main-branches's gap. tree-wrapper now
-         centers tree-core and .project-card independently, each
-         sized to their own content. -->
-    <div class="tree-core">
-
-    <!-- ROOT -->
-    <div class="root-column">
-      <div class="root-box">
-        Proto-Chibchan
-      </div>
-    </div>
-
-
-    <!-- Large brace after root -->
-    <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-      <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-    </svg>
-
-
-    <!-- MAIN BRANCHES -->
-    <div class="main-branches">
-
-      <!-- =================================================
-           PROTO-CHIBCHENSE MERIDIONAL
-      ================================================== -->
-
-      <div class="major-branch upper-branch">
-
-        <div class="branch-label">
-          Proto-chibchense<br>
-          meridional
-        </div>
-
-        <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-        </svg>
-
-
-        <div class="subbranches">
-
-          <!-- VÓTICO -->
-          <div class="tree-row">
-
-            <div class="branch-box">
-              Vótico
-            </div>
-
-            <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-            </svg>
-
-            
-
-            <div class="language-chain">
-              <a class="language-box" href="{{ '/pages/rama.html' | relative_url }}">Rama</a>
-              <a class="language-box" href="{{ '/pages/guatuso-maleku.html' | relative_url }}">Maleku</a>
-              <a class="language-box dashed" href="{{ '/pages/huetar.html' | relative_url }}">Huetar</a>
-            </div>
-
-            <!-- Quepo, placed here as a pure layout/design choice —
-                 no brace connects it to this row, so it isn't implying
-                 any classification relationship to Vótico or Huetar.
-                 See the removed .tree-orphans block for why: no
-                 source places Quepo anywhere in the family tree. -->
-            <a class="language-box dashed quepo-placement" href="{{ '/pages/quepo.html' | relative_url }}">Quepo</a>
-
-          </div>
-
-
-          <!-- MAGDALENICO -->
-          <div class="tree-row">
-
-            <div class="branch-box">
-              Magdálenico
-            </div>
-
-            <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-            </svg>
-
-            
-
-            <div class="language-chain">
-              <a class="language-box" href="{{ '/pages/muisca.html' | relative_url }}">Muisca</a>
-              <a class="language-box" href="{{ '/pages/kogi.html' | relative_url }}">Kogi</a>
-              <a class="language-box" href="{{ '/pages/ika.html' | relative_url }}">Ika</a>
-              <a class="language-box" href="{{ '/pages/bari.html' | relative_url }}">Barí</a>
-              <a class="language-box" href="{{ '/pages/chimila.html' | relative_url }}">Chimila</a>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- Paya: the first language to split off Proto-Chibchan,
-           before the meridional/Ístmico divergence — placed in the
-           same column as the branch-label boxes (flush with
-           "Proto-chibchense meridional" / "Ístmico" below), between
-           the two major branches, with no brace/connector since it
-           isn't nested under either. -->
-      <div class="orphan-row">
-        <a class="language-box" href="{{ '/pages/paya-pech.html' | relative_url }}">Paya</a>
-      </div>
-
-
-
-
-      <!-- =================================================
-           ISTMICO
-      ================================================== -->
-
-      <div class="major-branch lower-branch">
-
-        <div class="branch-label istmico-main">
-          Ístmico
-        </div>
-
-        <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-        </svg>
-
-
-        <div class="subbranches istmico-subbranches">
-
-          <!-- =============================================
-               ISTMICO OCCIDENTAL
-          ============================================== -->
-
-          <div class="tree-row">
-
-            <div class="branch-box branch-two-line">
-              Ístmico<br>
-              occidental
-            </div>
-
-            <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-            </svg>
-
-            <div class="western-group">
-
-              <!-- Viceitico -->
-              <div class="tree-row nested-row">
-
-                <div class="branch-box">
-                  Viceítico
-                </div>
-
-                <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                  <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-                </svg>
-
-                <div class="language-chain">
-                  <a class="language-box" href="{{ '/pages/bribri.html' | relative_url }}">Bribri</a>
-                  <a class="language-box" href="{{ '/pages/cabecar.html' | relative_url }}">Cabécar</a>
-                </div>
-
-              </div>
-
-
-              <!-- Naso / Boruca -->
-              <div class="tree-row nested-row">
-
-                
-
-                <a class="language-box" href="{{ '/pages/naso-terraba.html' | relative_url }}">
-                  Naso
-                </a>
-
-                <a class="language-box" href="{{ '/pages/boruca/grammar.html' | relative_url }}">
-                  Boruca
-                </a>
-
-                <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                  <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-                </svg>
-
-                <a class="language-box revived" href="{{ '/pages/revived-bruncajc.html' | relative_url }}">
-                  Proposed Boruca
-                </a>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-
-          <!-- =============================================
-               DORACICO
-          ============================================== -->
-
-          <div class="tree-row">
-
-            <div class="branch-box">
-              Dorácico
-            </div>
-
-            <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-            </svg>
-
-            
-
-            <div class="language-chain">
-              <a class="language-box" href="{{ '/pages/dorasque.html' | relative_url }}">Dorasque</a>
-              <a class="language-box" href="{{ '/pages/changuena.html' | relative_url }}">Chánguena</a>
-            </div>
-
-          </div>
-
-
-
-          <!-- =============================================
-               ISTMICO ORIENTAL
-          ============================================== -->
-
-          <div class="tree-row">
-
-            <div class="branch-box branch-two-line">
-              Ístmico oriental
-            </div>
-
-            <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-            </svg>
-
-            <div class="eastern-group">
-
-              <!-- Guaymico -->
-              <div class="tree-row nested-row">
-
-                <div class="branch-box">
-                  Guaymíco
-                </div>
-
-                <svg class="brace" viewBox="0 0 24 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                  <path d="M20,2 C10,2 10,2 10,20 C10,32 2,32 2,50 C2,68 10,68 10,80 C10,98 10,98 20,98" />
-                </svg>
-
-                <div class="language-chain">
-                  <a class="language-box" href="{{ '/pages/bocota.html' | relative_url }}">Bocotá</a>
-                  <a class="language-box" href="{{ '/pages/guaymi-ngabe.html' | relative_url }}">Ngäbe</a>
-                </div>
-
-              </div>
-
-
-              <!-- Kuna -->
-              <div class="tree-row nested-row">
-
-                
-
-                <a class="language-box" href="{{ '/pages/kuna.html' | relative_url }}">
-                  Kuna
-                </a>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    </div>
-
-
-    <!-- =================================================
-         PROJECT CARD
-    ================================================== -->
-
-    <div class="project-card">
-      <h3>Project Shá's</h3>
-
-      <p>
-        <em>Shá's</em> means root in Boruca. This project takes its
-        name from that word because it's meant as the root system
-        this project draws from — the linguists, missionaries,
-        community members, and researchers whose scattered work over
-        the decades this project is built on.
+  <main class="home-main">
+
+    <section class="home-intro">
+      <h1>Bruncájc <span class="home-intro-native">(Boruca)</span></h1>
+
+      <p class="home-intro-lede">
+        A Chibchan language of southern Costa Rica, today spoken fluently by
+        only a handful of elders. This project documents Bruncájc as it has
+        been recorded and spoken — and, separately, explores what a
+        deliberate revival of the language could look like.
       </p>
 
-      <p>
-        Project Shá's was built using AI, and AI is also used here for
-        linguistic analysis — helping organize, cross-reference, and
-        make sense of sources across the Chibchan language family.
-        It's built for speakers, students, and academics alike.
+      <p class="home-disclaimer">
+        <strong>This project is an experiment in using AI for language
+        revival work</strong> — it is not a substitute for the language,
+        for its speakers, or for the community's own authority over it.
+        It's offered as one way to study and test strategies for language
+        revival, built and analyzed with AI assistance throughout.
+        <a href="{{ '/pages/about.html' | relative_url }}">Read more about the project &rarr;</a>
       </p>
+    </section>
 
-      <p>
-        We believe this project, and the use of artificial
-        intelligence more broadly, can help make linguistic
-        information more accessible and support language revival
-        efforts.
-      </p>
+    <section class="home-menu">
 
-      <a class="project-card-more" href="{{ '/pages/about.html' | relative_url }}">
-        Read more <span aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
+      <div class="home-panel home-panel-sha">
+        <h2>Shá's</h2>
+        <p class="home-panel-sub">the language as documented — current, traditional Bruncájc</p>
+        <div class="home-panel-links">
+          <a class="home-panel-link" href="{{ '/pages/boruca/grammar.html' | relative_url }}">Grammar</a>
+          <a class="home-panel-link" href="{{ '/pages/boruca/dictionary.html' | relative_url }}">Dictionary</a>
+        </div>
+      </div>
 
-  </div>
+      <div class="home-panel home-panel-tru">
+        <h2>Trú</h2>
+        <p class="home-panel-sub">a proposed, modernized Bruncájc — a revival strategy</p>
+        <div class="home-panel-links">
+          <a class="home-panel-link" href="{{ '/pages/tru/grammar.html' | relative_url }}">Grammar</a>
+          <a class="home-panel-link" href="{{ '/pages/tru/dictionary.html' | relative_url }}">Dictionary</a>
+        </div>
+      </div>
 
+    </section>
 
-
-  <!-- =====================================================
-       LEGEND
-  ====================================================== -->
-
-  <div class="legend">
-
-    <div class="legend-item">
-      <span class="legend-square proto-square"></span>
-      <span>Proto-Chibchan</span>
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-square branch-square"></span>
-      <span>Branch + sub-branch</span>
-    </div>
-
-    <div class="legend-item">
-      <span class="legend-square language-square"></span>
-      <span>Language</span>
-    </div>
-
-  </div>
-
-
-  <!-- =====================================================
-       BOTTOM DECORATIVE LINE
-  ====================================================== -->
+  </main>
 
   <div class="bottom-line">
     <span class="line-dot"></span>

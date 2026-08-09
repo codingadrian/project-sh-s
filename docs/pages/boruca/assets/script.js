@@ -35,10 +35,6 @@
   var morphSelect = document.getElementById("filter-morph");
   var domainSelect = document.getElementById("filter-domain");
   var statusSelect = document.getElementById("filter-status");
-  var dupCheckbox = document.getElementById("filter-dup");
-  var dupTotalEl = document.getElementById("dup-total");
-  var headwordDupCheckbox = document.getElementById("filter-headword-dup");
-  var headwordDupTotalEl = document.getElementById("headword-dup-total");
   var listEl = document.getElementById("word-list");
   var panelEl = document.getElementById("entry-panel");
   var countEl = document.getElementById("count");
@@ -222,18 +218,8 @@
   fillSelect(morphSelect, FACETS.morphologyType || []);
   fillSelect(domainSelect, FACETS.semanticDomain || []);
 
-  var state = { query: "", pos: "", morph: "", domain: "", status: "", dupOnly: false, headwordDupOnly: false, selectedId: null, editingId: null };
+  var state = { query: "", pos: "", morph: "", domain: "", status: "", selectedId: null, editingId: null };
   var filtered = ALL;
-
-  var TOTAL_DUP_ENTRIES = ALL.reduce(function (n, e) { return (e.dup_group || e.exact_dup_group) ? n + 1 : n; }, 0);
-  if (dupTotalEl) dupTotalEl.textContent = TOTAL_DUP_ENTRIES ? "(" + TOTAL_DUP_ENTRIES.toLocaleString() + ")" : "";
-
-  // Broadest tier: any 2+ active entries sharing the exact same headword
-  // string, regardless of gloss -- a triage queue mixing genuine polysemous
-  // roots with leftover batch-reimport duplicates the exact-match detector
-  // misses (see build_docs_content.py's headword_group comment).
-  var TOTAL_HEADWORD_DUP_ENTRIES = ALL.reduce(function (n, e) { return e.headword_group ? n + 1 : n; }, 0);
-  if (headwordDupTotalEl) headwordDupTotalEl.textContent = TOTAL_HEADWORD_DUP_ENTRIES ? "(" + TOTAL_HEADWORD_DUP_ENTRIES.toLocaleString() + ")" : "";
 
   function normalize(s) {
     return (s || "").toString().toLowerCase();
@@ -278,8 +264,6 @@
       if (state.domain && e.semantic_domain !== state.domain) return false;
       if (state.status === "reviewed" && e.project_review_status !== "reviewed") return false;
       if (state.status === "unreviewed" && e.project_review_status === "reviewed") return false;
-      if (state.dupOnly && !e.dup_group && !e.exact_dup_group) return false;
-      if (state.headwordDupOnly && !e.headword_group) return false;
       if (!q) return true;
       return (
         normalize(e.headword).indexOf(q) !== -1 ||
@@ -319,7 +303,7 @@
           (isDeleted(e.id) ? '<span class="w-deleted">deleted</span>' : "") +
           (edits[e.id] ? '<span class="w-edited">edited</span>' : "") +
           (e.exact_dup_group ? '<span class="w-exact-dup" title="Byte-identical headword + gloss to ' + e.exact_dup_siblings.length + ' other entr' + (e.exact_dup_siblings.length === 1 ? "y" : "ies") + ' — a true duplicate, not a homograph">duplicate</span>' : "") +
-          (!e.exact_dup_group && e.headword_group ? '<span class="w-headword-dup" title="Same headword as ' + e.headword_siblings.length + ' other entr' + (e.headword_siblings.length === 1 ? "y" : "ies") + ' (gloss differs) — could be a genuine extra sense or a leftover duplicate, needs a look">same headword</span>' : "") +
+          (!e.exact_dup_group && e.headword_group ? '<span class="w-headword-dup" title="Same headword and part of speech as ' + e.headword_siblings.length + ' other entr' + (e.headword_siblings.length === 1 ? "y" : "ies") + ' (gloss differs) — could be a genuine extra sense or a leftover duplicate, needs a look">same headword</span>' : "") +
           (!e.exact_dup_group && !e.headword_group && e.dup_group ? '<span class="w-dup" title="Shares a spelling with ' + e.dup_siblings.length + ' other entr' + (e.dup_siblings.length === 1 ? "y" : "ies") + '">dup</span>' : "") +
           (e.project_review_status === "reviewed" ? '<span class="w-reviewed" title="Reviewed">&#10003;</span>' : "") +
           (glossPreview ? '<span class="w-gloss">' + escapeHtml(glossPreview) + "</span>" : "") +
@@ -417,7 +401,7 @@
       parts.push(
         '<div class="headword-dup-callout">' +
           '<span class="headword-dup-title">Same headword</span>' +
-          '<span class="dup-explain">gloss differs from the exact-duplicate check, so this could be a genuine extra sense or a leftover duplicate — compare and decide:</span>' +
+          '<span class="dup-explain">same headword and part of speech, but gloss differs from the exact-duplicate check, so this could be a genuine extra sense or a leftover duplicate — compare and decide:</span>' +
           headwordLinks +
         "</div>"
       );
@@ -641,15 +625,6 @@
     state.status = statusSelect.value;
     applyFilters();
   });
-  dupCheckbox.addEventListener("change", function () {
-    state.dupOnly = dupCheckbox.checked;
-    applyFilters();
-  });
-  headwordDupCheckbox.addEventListener("change", function () {
-    state.headwordDupOnly = headwordDupCheckbox.checked;
-    applyFilters();
-  });
-
   applyFilters();
   refreshChangesBar();
 

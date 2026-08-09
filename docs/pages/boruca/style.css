@@ -58,8 +58,11 @@ a { color: var(--accent); }
 
 /* Page nav (Grammar / Dictionary) — reuses site.css's .navbar-links
    pill-link component so these look like the same UI element as the
-   navbar above. Centered now that there's no third "Tree" link to
-   left-align against (the shared navbar's logo already links home). */
+   navbar above. Centered, with a .track-label pill (see below) at the
+   start marking which of the two tracks — Shá's (current, documented
+   Bruncájc) or Trú (proposed revived Bruncájc) — this page belongs
+   to, since both tracks otherwise show an identical Grammar/
+   Dictionary nav. */
 .boruca-nav {
   height: 52px;
   justify-content: center;
@@ -69,6 +72,31 @@ a { color: var(--accent); }
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow);
+}
+
+/* Matches the homepage's .home-panel-sha/.home-panel-tru color coding
+   (site.css) so the pill reads as the same "which track am I on"
+   signal across the whole site. */
+.track-label {
+  padding: 3px 12px;
+  margin-right: 6px;
+
+  border: 2px solid var(--border-strong);
+  border-radius: 999px;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+}
+
+.track-label-sha {
+  background: #eaf2fb;
+  color: var(--accent);
+}
+
+.track-label-tru {
+  background: #f7b267;
+  color: #5e3a12;
 }
 
 .layout {
@@ -129,6 +157,46 @@ main.content > * {
 
 @media (max-width: 620px) {
   main.content { padding: 1.5rem 1.1rem 4rem; }
+}
+
+/* Standalone prose pages that don't use the .layout TOC grid (Trú's
+   placeholder grammar/dictionary pages) — same reading width as
+   main.content > *, just self-centered without needing the grid. */
+.coming-soon-main {
+  max-width: 78ch;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 6rem;
+}
+
+@media (max-width: 620px) {
+  .coming-soon-main { padding: 1.5rem 1.1rem 4rem; }
+}
+
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  margin-bottom: 1.1rem;
+  padding: 4px 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 999px;
+
+  font-family: system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  color: var(--ink-soft);
+}
+
+.coming-soon-badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d99a2b;
 }
 
 h1, h2, h3, h4 { font-family: "Iowan Old Style", Georgia, serif; line-height: 1.25; color: var(--ink); scroll-margin-top: 70px; }

@@ -14,6 +14,7 @@ layout: null
 <div class="boruca-header">
   {% include navbar.html %}
   <nav class="navbar-links boruca-nav">
+    <span class="track-label track-label-sha">Shá's</span>
     <a href="{{ '/pages/boruca/grammar.html' | relative_url }}">Grammar</a>
     <a href="{{ '/pages/boruca/dictionary.html' | relative_url }}" class="active">Dictionary</a>
   </nav>
@@ -34,14 +35,6 @@ layout: null
           <option value="deleted">Deleted (locally)</option>
         </select>
       </div>
-      <label class="dup-filter">
-        <input type="checkbox" id="filter-dup">
-        Duplicates only (spelling clashes + exact dupes) <span id="dup-total"></span>
-      </label>
-      <label class="dup-filter dup-filter-headword">
-        <input type="checkbox" id="filter-headword-dup">
-        Same headword only (review for merge/polysemy) <span id="headword-dup-total"></span>
-      </label>
       <div class="dict-count" id="count"></div>
       <div class="edits-bar" id="edits-bar" hidden>
         <span id="edits-count"></span>
