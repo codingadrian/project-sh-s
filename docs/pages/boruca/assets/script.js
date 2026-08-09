@@ -37,6 +37,8 @@
   var statusSelect = document.getElementById("filter-status");
   var dupCheckbox = document.getElementById("filter-dup");
   var dupTotalEl = document.getElementById("dup-total");
+  var headwordDupCheckbox = document.getElementById("filter-headword-dup");
+  var headwordDupTotalEl = document.getElementById("headword-dup-total");
   var listEl = document.getElementById("word-list");
   var panelEl = document.getElementById("entry-panel");
   var countEl = document.getElementById("count");
@@ -220,11 +222,18 @@
   fillSelect(morphSelect, FACETS.morphologyType || []);
   fillSelect(domainSelect, FACETS.semanticDomain || []);
 
-  var state = { query: "", pos: "", morph: "", domain: "", status: "", dupOnly: false, selectedId: null, editingId: null };
+  var state = { query: "", pos: "", morph: "", domain: "", status: "", dupOnly: false, headwordDupOnly: false, selectedId: null, editingId: null };
   var filtered = ALL;
 
   var TOTAL_DUP_ENTRIES = ALL.reduce(function (n, e) { return (e.dup_group || e.exact_dup_group) ? n + 1 : n; }, 0);
   if (dupTotalEl) dupTotalEl.textContent = TOTAL_DUP_ENTRIES ? "(" + TOTAL_DUP_ENTRIES.toLocaleString() + ")" : "";
+
+  // Broadest tier: any 2+ active entries sharing the exact same headword
+  // string, regardless of gloss -- a triage queue mixing genuine polysemous
+  // roots with leftover batch-reimport duplicates the exact-match detector
+  // misses (see build_docs_content.py's headword_group comment).
+  var TOTAL_HEADWORD_DUP_ENTRIES = ALL.reduce(function (n, e) { return e.headword_group ? n + 1 : n; }, 0);
+  if (headwordDupTotalEl) headwordDupTotalEl.textContent = TOTAL_HEADWORD_DUP_ENTRIES ? "(" + TOTAL_HEADWORD_DUP_ENTRIES.toLocaleString() + ")" : "";
 
   function normalize(s) {
     return (s || "").toString().toLowerCase();
@@ -270,6 +279,7 @@
       if (state.status === "reviewed" && e.project_review_status !== "reviewed") return false;
       if (state.status === "unreviewed" && e.project_review_status === "reviewed") return false;
       if (state.dupOnly && !e.dup_group && !e.exact_dup_group) return false;
+      if (state.headwordDupOnly && !e.headword_group) return false;
       if (!q) return true;
       return (
         normalize(e.headword).indexOf(q) !== -1 ||
@@ -301,14 +311,16 @@
       var glossPreview = e.gloss_es || e.gloss_en || "";
       var activeClass = e.id === state.selectedId ? " active" : "";
       var exactDupClass = e.exact_dup_group ? " has-exact-dup" : "";
+      var headwordDupClass = (!e.exact_dup_group && e.headword_group) ? " has-headword-dup" : "";
       html.push(
-        '<div class="word-item' + activeClass + exactDupClass + '" data-id="' + e.id + '" role="button" tabindex="0">' +
+        '<div class="word-item' + activeClass + exactDupClass + headwordDupClass + '" data-id="' + e.id + '" role="button" tabindex="0">' +
           '<span class="w-head">' + escapeHtml(e.headword) + "</span>" +
           (e.part_of_speech ? '<span class="w-pos">' + escapeHtml(posLabel(e)) + "</span>" : "") +
           (isDeleted(e.id) ? '<span class="w-deleted">deleted</span>' : "") +
           (edits[e.id] ? '<span class="w-edited">edited</span>' : "") +
           (e.exact_dup_group ? '<span class="w-exact-dup" title="Byte-identical headword + gloss to ' + e.exact_dup_siblings.length + ' other entr' + (e.exact_dup_siblings.length === 1 ? "y" : "ies") + ' — a true duplicate, not a homograph">duplicate</span>' : "") +
-          (!e.exact_dup_group && e.dup_group ? '<span class="w-dup" title="Shares a spelling with ' + e.dup_siblings.length + ' other entr' + (e.dup_siblings.length === 1 ? "y" : "ies") + '">dup</span>' : "") +
+          (!e.exact_dup_group && e.headword_group ? '<span class="w-headword-dup" title="Same headword as ' + e.headword_siblings.length + ' other entr' + (e.headword_siblings.length === 1 ? "y" : "ies") + ' (gloss differs) — could be a genuine extra sense or a leftover duplicate, needs a look">same headword</span>' : "") +
+          (!e.exact_dup_group && !e.headword_group && e.dup_group ? '<span class="w-dup" title="Shares a spelling with ' + e.dup_siblings.length + ' other entr' + (e.dup_siblings.length === 1 ? "y" : "ies") + '">dup</span>' : "") +
           (e.project_review_status === "reviewed" ? '<span class="w-reviewed" title="Reviewed">&#10003;</span>' : "") +
           (glossPreview ? '<span class="w-gloss">' + escapeHtml(glossPreview) + "</span>" : "") +
           "</div>"
@@ -391,6 +403,22 @@
           '<span class="exact-dup-title">Exact duplicate</span>' +
           '<span class="dup-explain">byte-identical headword and gloss to:</span>' +
           exactLinks +
+        "</div>"
+      );
+    } else if (entry.headword_group && entry.headword_siblings.length) {
+      var headwordLinks = entry.headword_siblings
+        .map(function (sid) {
+          var sib = BY_ID[sid];
+          if (!sib) return "";
+          return '<button type="button" class="dup-link dup-link-headword" data-action="goto" data-id="' + sid + '">' + escapeHtml(sib.headword) + " — " + escapeHtml(sib.gloss_es || sib.gloss_en || "") + " (#" + formatIndex(sib.id) + ")</button>";
+        })
+        .filter(Boolean)
+        .join("");
+      parts.push(
+        '<div class="headword-dup-callout">' +
+          '<span class="headword-dup-title">Same headword</span>' +
+          '<span class="dup-explain">gloss differs from the exact-duplicate check, so this could be a genuine extra sense or a leftover duplicate — compare and decide:</span>' +
+          headwordLinks +
         "</div>"
       );
     } else if (entry.dup_group && entry.dup_siblings.length) {
@@ -615,6 +643,10 @@
   });
   dupCheckbox.addEventListener("change", function () {
     state.dupOnly = dupCheckbox.checked;
+    applyFilters();
+  });
+  headwordDupCheckbox.addEventListener("change", function () {
+    state.headwordDupOnly = headwordDupCheckbox.checked;
     applyFilters();
   });
 
